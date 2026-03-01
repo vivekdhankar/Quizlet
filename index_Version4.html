@@ -1,0 +1,1806 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Study Program v1.2 (Sources + Subjects/Topics + Multi-scope Quiz)</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#111a33;
+      --panel2:#0f1730;
+      --text:#e8ecff;
+      --muted:#b9c2ffcc;
+      --border:#2a355f;
+      --accent:#7aa2ff;
+      --accent2:#53e0c4;
+      --danger:#ff6b7a;
+      --warn:#ffcc66;
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 20% -10%, #1b2a6b 0%, transparent 60%),
+                  radial-gradient(1000px 500px at 95% 5%, #0a6d79 0%, transparent 55%),
+                  linear-gradient(180deg, var(--bg), #050816 60%, #040610);
+      color:var(--text);
+    }
+    a{color:var(--accent)}
+    .container{max-width:1200px;margin:0 auto;padding:24px 16px 40px}
+    header{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .title{display:flex;flex-direction:column;gap:4px}
+    h1{font-size:20px;margin:0;letter-spacing:.2px}
+    .subtitle{font-size:12.5px;color:var(--muted);line-height:1.4}
+    nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .tab{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:13px;
+      transition:.15s ease;
+      user-select:none;
+    }
+    .tab:hover{transform:translateY(-1px);border-color:#3b4a82}
+    .tab.active{
+      background:linear-gradient(180deg, rgba(122,162,255,.22), rgba(122,162,255,.08));
+      border-color:rgba(122,162,255,.55);
+      box-shadow:0 0 0 3px rgba(122,162,255,.08);
+    }
+
+    .grid{display:grid;grid-template-columns:320px 320px 1fr;gap:14px;align-items:start}
+    @media (max-width: 1060px){ .grid{grid-template-columns: 1fr} }
+
+    .panel{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(17,26,51,.94), rgba(9,13,28,.94));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panel .hd h2{margin:0;font-size:14px;letter-spacing:.2px}
+    .panel .bd{padding:14px}
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .col{display:flex;flex-direction:column;gap:8px}
+    label{font-size:12px;color:var(--muted)}
+    input[type="text"], textarea, select{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:10px;
+      outline:none;
+      transition:.15s ease;
+      font-size:13px;
+    }
+    textarea{min-height:86px;resize:vertical}
+    input[type="text"]:focus, textarea:focus, select:focus{
+      border-color:rgba(122,162,255,.65);
+      box-shadow:0 0 0 3px rgba(122,162,255,.10);
+    }
+
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:13px;
+      transition:.15s ease;
+      user-select:none;
+    }
+    .btn:hover{transform:translateY(-1px);border-color:#3b4a82}
+    .btn.primary{
+      background:linear-gradient(180deg, rgba(122,162,255,.30), rgba(122,162,255,.10));
+      border-color:rgba(122,162,255,.55);
+    }
+    .btn.good{
+      background:linear-gradient(180deg, rgba(83,224,196,.25), rgba(83,224,196,.08));
+      border-color:rgba(83,224,196,.5);
+    }
+    .btn.danger{
+      background:linear-gradient(180deg, rgba(255,107,122,.22), rgba(255,107,122,.08));
+      border-color:rgba(255,107,122,.55);
+    }
+    .btn.warn{
+      background:linear-gradient(180deg, rgba(255,204,102,.22), rgba(255,204,102,.08));
+      border-color:rgba(255,204,102,.55);
+    }
+    .btn.ghost{background:transparent}
+    .btn.small{padding:7px 10px;border-radius:9px;font-size:12px}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    .list{display:flex;flex-direction:column;gap:8px}
+    .item{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .item:hover{border-color:rgba(255,255,255,.14)}
+    .item .meta{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+    .item .meta .name{font-weight:600;font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .item .meta .sub{font-size:12px;color:var(--muted)}
+    .badge{
+      font-family:var(--mono);
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      background:rgba(255,255,255,.04);
+      white-space:nowrap;
+    }
+
+    .qcard{
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 10px 20px rgba(0,0,0,.18);
+    }
+    .qtext{font-size:14px;line-height:1.5;margin:0 0 10px}
+    .muted{color:var(--muted)}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:12px 0}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .result{
+      margin-top:10px;
+      border-radius:12px;
+      padding:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+    }
+    .result.correct{border-color:rgba(83,224,196,.5);background:rgba(83,224,196,.08)}
+    .result.incorrect{border-color:rgba(255,107,122,.55);background:rgba(255,107,122,.08)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width: 700px){ .two{grid-template-columns:1fr} }
+
+    .toast{
+      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+      background:rgba(10,14,28,.92);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:var(--shadow);
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:13px;color:var(--text);
+      display:none;gap:10px;align-items:center;
+      max-width:calc(100vw - 32px);
+    }
+    .toast.show{display:flex}
+    .toast .dot{
+      width:9px;height:9px;border-radius:50%;
+      background:var(--accent2);
+      box-shadow:0 0 0 4px rgba(83,224,196,.15);
+      flex:0 0 auto;
+    }
+    .kpi{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .kpi .pill strong{color:var(--text);font-weight:700}
+    .smallnote{font-size:12px;color:var(--muted);line-height:1.45}
+    .mono{font-family:var(--mono)}
+    .checkbox{display:flex;gap:10px;align-items:center}
+    .checkbox input{width:auto}
+    .split{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .multi{
+      min-height: 160px;
+      font-family: var(--mono);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title">
+        <h1>Study Program</h1>
+        <div class="subtitle">Sources (multi-file import) • Subjects → Topics → Questions • Multi-scope Quiz (subjects/topics) • LocalStorage</div>
+      </div>
+      <nav aria-label="Views">
+        <button class="tab active" data-view="bank">Question Bank</button>
+        <button class="tab" data-view="quiz">Quiz Mode</button>
+        <button class="tab" data-view="bookmarks">Bookmarked</button>
+        <button class="tab" data-view="data">Import/Export</button>
+      </nav>
+    </header>
+
+    <!-- BANK VIEW -->
+    <section id="view-bank" class="grid">
+      <!-- SUBJECTS -->
+      <div class="panel">
+        <div class="hd">
+          <h2>Subjects</h2>
+          <span class="badge" id="subjects-count">0</span>
+        </div>
+        <div class="bd">
+          <div class="col">
+            <div class="col">
+              <label for="subjectName">Create subject</label>
+              <div class="row">
+                <input id="subjectName" type="text" placeholder='e.g., "Math"' />
+                <button class="btn primary" id="btnAddSubject">Add</button>
+              </div>
+              <div class="smallnote">Manual content is stored in a local source called <span class="mono">Local</span>.</div>
+            </div>
+            <div class="hr"></div>
+            <div class="col">
+              <label>Subject list</label>
+              <div class="list" id="subjectsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPICS -->
+      <div class="panel">
+        <div class="hd">
+          <h2>Topics</h2>
+          <span class="badge" id="topics-count">0</span>
+        </div>
+        <div class="bd">
+          <div class="col">
+            <div class="col">
+              <label for="topicName">Create topic (under selected subject)</label>
+              <div class="row">
+                <input id="topicName" type="text" placeholder='e.g., "Algebra"' />
+                <button class="btn primary" id="btnAddTopic">Add</button>
+              </div>
+              <div class="smallnote">Topics are the old “chapters”. Imported data is read-only; edit Local topics/questions.</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="col">
+              <label>Topic list</label>
+              <div class="list" id="topicsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div class="panel">
+        <div class="hd">
+          <h2>Questions</h2>
+          <span class="badge" id="questions-count">0</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="col">
+              <label for="topicSelect">Select topic</label>
+              <select id="topicSelect"></select>
+            </div>
+            <div class="col">
+              <label for="searchInput">Search (optional)</label>
+              <input id="searchInput" type="text" placeholder="Search question text..." />
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="qcard">
+            <div class="row" style="justify-content:space-between; align-items:center">
+              <div class="pill" title="Add/edit uses the same form">
+                <span class="mono">Form</span>
+                <span class="muted" id="formModeLabel">Add</span>
+              </div>
+              <div class="row">
+                <button class="btn small ghost" id="btnClearForm" title="Reset the form">Clear</button>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="col">
+              <input type="hidden" id="editingQuestionId" value="" />
+              <label for="questionText">Question</label>
+              <textarea id="questionText" placeholder="Enter question text..."></textarea>
+
+              <label for="correctAnswer">Correct answer</label>
+              <input id="correctAnswer" type="text" placeholder="Enter correct answer..." />
+
+              <div class="row" style="justify-content:flex-end">
+                <button class="btn good" id="btnSaveQuestion">Save Question</button>
+              </div>
+
+              <div class="smallnote">Quiz checks are case-insensitive and trim whitespace.</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row" style="justify-content:space-between; align-items:center">
+            <label style="margin:0">Questions in selected topic</label>
+            <div class="kpi">
+              <span class="pill"><span class="muted">Total:</span> <strong id="kpiTotal">0</strong></span>
+              <span class="pill"><span class="muted">Bookmarked:</span> <strong id="kpiBookmarked">0</strong></span>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="list" id="questionsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ VIEW -->
+    <section id="view-quiz" class="panel" style="display:none">
+      <div class="hd">
+        <h2>Quiz Mode</h2>
+        <span class="badge" id="quizBadge">Ready</span>
+      </div>
+      <div class="bd">
+        <div class="qcard">
+          <div style="font-weight:700;margin-bottom:6px">Quiz Scope</div>
+          <div class="smallnote" style="margin-bottom:10px">
+            Select <strong>multiple subjects</strong> and/or <strong>multiple topics</strong>.
+            If you select multiple subjects, all topics of those subjects are automatically included.
+            If you select only topics, subjects are optional.
+          </div>
+
+          <div class="two">
+            <div class="col">
+              <label for="quizSubjectsSelect">Subjects (multi-select)</label>
+              <select id="quizSubjectsSelect" class="multi" multiple></select>
+              <div class="row">
+                <button class="btn small" id="btnQuizSelectAllSubjects">Select All</button>
+                <button class="btn small ghost" id="btnQuizClearSubjects">Clear</button>
+              </div>
+            </div>
+
+            <div class="col">
+              <label for="quizTopicsSelect">Topics (multi-select)</label>
+              <select id="quizTopicsSelect" class="multi" multiple></select>
+              <div class="row">
+                <button class="btn small" id="btnQuizSelectAllTopics">Select All</button>
+                <button class="btn small ghost" id="btnQuizClearTopics">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row" style="justify-content:space-between;align-items:center">
+            <div class="row">
+              <span class="pill"><span class="muted">Questions in scope:</span> <strong id="quizScopeCount">0</strong></span>
+              <span class="pill"><span class="muted">Score:</span> <strong id="scoreLabel">0</strong></span>
+              <span class="pill"><span class="muted">Seen:</span> <strong id="seenLabel">0</strong></span>
+              <span class="pill"><span class="muted">Progress:</span> <strong id="progressLabel">0 of 0</strong></span>
+            </div>
+            <div class="row">
+              <button class="btn small" id="btnQuizBookmark" disabled>Bookmark</button>
+              <button class="btn small warn" id="btnStartQuiz">Start</button>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <p class="qtext" id="quizQuestionText">Select scope and press Start.</p>
+
+          <div class="col">
+            <label for="quizAnswerInput">Your answer</label>
+            <input id="quizAnswerInput" type="text" placeholder="Type your answer..." disabled />
+            <div class="row" style="justify-content:flex-end">
+              <button class="btn good" id="btnSubmitAnswer" disabled>Submit</button>
+              <button class="btn primary" id="btnNextQuestion" disabled>Next Question</button>
+            </div>
+          </div>
+
+          <div id="quizResult" class="result" style="display:none"></div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="smallnote">
+          Notes: Quiz uses questions from enabled sources only. Imported sources are read-only for editing, but fully quiz-able.
+        </div>
+      </div>
+    </section>
+
+    <!-- BOOKMARKS VIEW -->
+    <section id="view-bookmarks" class="panel" style="display:none">
+      <div class="hd">
+        <h2>Bookmarked Questions</h2>
+        <span class="badge" id="bookmarks-count">0</span>
+      </div>
+      <div class="bd">
+        <div class="row" style="justify-content:space-between; align-items:center">
+          <div class="smallnote">If a bookmarked question belongs to a disabled source, it won’t appear until re-enabled.</div>
+          <button class="btn danger" id="btnClearBookmarks" title="Remove all bookmarks">Clear All</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="list" id="bookmarksList"></div>
+      </div>
+    </section>
+
+    <!-- DATA VIEW -->
+    <section id="view-data" class="panel" style="display:none">
+      <div class="hd">
+        <h2>Import / Export (Sources)</h2>
+        <span class="badge">JSON</span>
+      </div>
+      <div class="bd">
+        <div class="col">
+          <div class="qcard">
+            <div class="split">
+              <div>
+                <div style="font-weight:700;margin-bottom:4px">Import JSON files (multiple)</div>
+                <div class="smallnote">Format A supported: array of {subject, topic, question, answer} OR { "questions": [...] }.</div>
+              </div>
+              <div class="row">
+                <label class="btn primary" for="importFiles" style="cursor:pointer">Select JSON Files</label>
+                <input id="importFiles" type="file" accept="application/json" multiple style="display:none" />
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="row" style="justify-content:space-between;align-items:center">
+              <div class="checkbox">
+                <input id="chkAutoEnable" type="checkbox" checked />
+                <label for="chkAutoEnable" style="margin:0">Auto-enable newly imported sources</label>
+              </div>
+              <div class="row">
+                <button class="btn warn" id="btnRebuildIndex" title="Rebuild the unified index from all enabled sources">Rebuild Index</button>
+                <button class="btn danger" id="btnResetAll" title="Deletes all stored data">Reset All Data</button>
+              </div>
+            </div>
+
+            <div id="importSummary" class="smallnote" style="margin-top:10px"></div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="panel" style="background:transparent;border:1px dashed rgba(255,255,255,.12);box-shadow:none">
+            <div class="hd">
+              <h2>Sources</h2>
+              <span class="badge" id="sources-count">0</span>
+            </div>
+            <div class="bd">
+              <div class="smallnote" style="margin-bottom:10px">
+                Toggle sources on/off to control what appears in the app. Manual edits are stored in <span class="mono">Local</span>.
+              </div>
+              <div class="list" id="sourcesList"></div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <button class="btn primary" id="btnExportAll">Export ALL (db + sources)</button>
+            <button class="btn" id="btnExportEnabled">Export ENABLED view</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <label for="dataPreview">Current stored JSON (read-only preview)</label>
+          <textarea id="dataPreview" readonly spellcheck="false" style="font-family:var(--mono); min-height:240px"></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="dot" aria-hidden="true"></span>
+    <span id="toastMsg">Saved</span>
+  </div>
+
+  <script>
+    /******************************************************************
+     * v1.2 changes (this update):
+     * - Quiz mode now supports:
+     *   - selecting multiple topics OR
+     *   - selecting all topics of one subject OR
+     *   - selecting multiple subjects (auto-selects ALL topics under each selected subject)
+     ******************************************************************/
+
+    const LS_KEYS = {
+      DB: "studyProgram.db.v1_1",       // keep same key as previous to preserve existing data
+      BOOKMARKS: "studyProgram.bookmarks.v1_1"
+    };
+
+    const $ = (sel) => document.querySelector(sel);
+
+    function uid(prefix="id"){
+      return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+    }
+    function now(){ return Date.now(); }
+
+    function toast(msg){
+      const el = $("#toast");
+      $("#toastMsg").textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove("show"), 1600);
+    }
+
+    function escapeHtml(str){
+      return (str ?? "")
+        .toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function normalize(s){ return (s || "").toString().trim(); }
+    function normKey(s){ return normalize(s).toLowerCase(); }
+
+    function hash32(str){
+      let h = 2166136261;
+      for(let i=0;i<str.length;i++){
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(16);
+    }
+
+    function makeQuestionFingerprint({subjectName, topicName, text, answer}){
+      const base = [subjectName, topicName, text, answer].map(normKey).join("|");
+      return "fp_" + hash32(base);
+    }
+
+    function loadDB(){
+      const fallback = {
+        version: 1.1,
+        sources: [],
+        local: { subjects: [], topics: [], questions: [] },
+        index: { subjects: [], topics: [], questions: [] },
+        cache: { lastBuiltAt: 0 }
+      };
+
+      try{
+        const raw = localStorage.getItem(LS_KEYS.DB);
+        if(!raw) return ensureLocalSource(fallback);
+        const parsed = JSON.parse(raw);
+        parsed.sources = Array.isArray(parsed.sources) ? parsed.sources : [];
+        parsed.local = parsed.local || { subjects: [], topics: [], questions: [] };
+        parsed.local.subjects = Array.isArray(parsed.local.subjects) ? parsed.local.subjects : [];
+        parsed.local.topics = Array.isArray(parsed.local.topics) ? parsed.local.topics : [];
+        parsed.local.questions = Array.isArray(parsed.local.questions) ? parsed.local.questions : [];
+        parsed.index = parsed.index || { subjects: [], topics: [], questions: [] };
+        parsed.index.subjects = Array.isArray(parsed.index.subjects) ? parsed.index.subjects : [];
+        parsed.index.topics = Array.isArray(parsed.index.topics) ? parsed.index.topics : [];
+        parsed.index.questions = Array.isArray(parsed.index.questions) ? parsed.index.questions : [];
+        parsed.cache = parsed.cache || { lastBuiltAt: 0 };
+        return ensureLocalSource(parsed);
+      }catch{
+        return ensureLocalSource(fallback);
+      }
+    }
+
+    function ensureLocalSource(dbObj){
+      const hasLocal = dbObj.sources.some(s => s.kind === "local" && s.id === "src_local");
+      if(!hasLocal){
+        dbObj.sources.unshift({
+          id: "src_local",
+          kind: "local",
+          name: "Local",
+          filename: "",
+          enabled: true,
+          importedAt: new Date().toISOString(),
+          stats: {}
+        });
+      }
+      return dbObj;
+    }
+
+    function saveDB(){
+      localStorage.setItem(LS_KEYS.DB, JSON.stringify(db));
+      refreshDataPreview();
+    }
+
+    function loadBookmarks(){
+      try{
+        const raw = localStorage.getItem(LS_KEYS.BOOKMARKS);
+        if(!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      }catch{
+        return [];
+      }
+    }
+    function saveBookmarks(){
+      localStorage.setItem(LS_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
+      refreshDataPreview();
+    }
+
+    let db = loadDB();
+    let bookmarks = loadBookmarks();
+
+    let selectedSubjectId = "";
+    let selectedTopicId = "";
+
+    // Quiz state (not persisted)
+    const quizState = {
+      selectedSubjectIds: new Set(),
+      selectedTopicIds: new Set(),
+      // derived at runtime:
+      questionPoolIds: [],
+      currentQuestionId: "",
+      score: 0,
+      seen: 0
+    };
+
+    function setActiveTab(view){
+      document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+      document.querySelectorAll("section[id^='view-']").forEach(s => s.style.display = "none");
+      const el = $(`#view-${view}`);
+      el.style.display = (view === "bank") ? "" : "block";
+      if(view === "data") refreshDataPreview();
+      if(view === "bookmarks") renderBookmarksView();
+      if(view === "quiz") syncQuizScopeUI();
+    }
+
+    // -----------------------------
+    // Index rebuilding (same behavior as v1.1)
+    // -----------------------------
+    function getEnabledSourceIds(){
+      return new Set(db.sources.filter(s => s.enabled).map(s => s.id));
+    }
+
+    function rebuildIndex(){
+      const enabled = getEnabledSourceIds();
+
+      const subjects = [];
+      const topics = [];
+      const questions = [];
+
+      function subjectIdFor(sourceId, subjectName){
+        return `sub_${sourceId}_${hash32(normKey(subjectName))}`;
+      }
+      function topicIdFor(sourceId, subjectName, topicName){
+        return `top_${sourceId}_${hash32(normKey(subjectName))}_${hash32(normKey(topicName))}`;
+      }
+      function questionIdFor(sourceId, fingerprint){
+        return `q_${sourceId}_${hash32(fingerprint)}`;
+      }
+
+      const seenSubjects = new Set();
+      const seenTopics = new Set();
+      const seenQuestions = new Set();
+
+      function addRecord(sourceId, rec){
+        const sName = normalize(rec.subject);
+        const tName = normalize(rec.topic);
+        const qText = normalize(rec.question);
+        const ans = normalize(rec.answer);
+        if(!sName || !tName || !qText || !ans) return;
+
+        const sid = subjectIdFor(sourceId, sName);
+        if(!seenSubjects.has(sid)){
+          subjects.push({ id: sid, name: sName, sourceId });
+          seenSubjects.add(sid);
+        }
+
+        const tid = topicIdFor(sourceId, sName, tName);
+        if(!seenTopics.has(tid)){
+          topics.push({ id: tid, subjectId: sid, name: tName, sourceId });
+          seenTopics.add(tid);
+        }
+
+        const fp = makeQuestionFingerprint({subjectName: sName, topicName: tName, text: qText, answer: ans});
+        const qid = questionIdFor(sourceId, fp);
+
+        if(seenQuestions.has(qid)) return;
+        questions.push({
+          id: qid,
+          topicId: tid,
+          text: qText,
+          answer: ans,
+          sourceId,
+          fingerprint: fp,
+          createdAt: now(),
+          updatedAt: now()
+        });
+        seenQuestions.add(qid);
+      }
+
+      if(enabled.has("src_local")){
+        for(const q of db.local.questions){
+          addRecord("src_local", q);
+        }
+      }
+
+      for(const src of db.sources){
+        if(src.id === "src_local") continue;
+        if(!enabled.has(src.id)) continue;
+        const rawList = Array.isArray(src.raw?.questions) ? src.raw.questions : (Array.isArray(src.raw) ? src.raw : []);
+        for(const rec of rawList) addRecord(src.id, rec);
+      }
+
+      subjects.sort((a,b) => a.name.localeCompare(b.name));
+      topics.sort((a,b) => a.name.localeCompare(b.name));
+      questions.sort((a,b) => b.updatedAt - a.updatedAt);
+
+      db.index = { subjects, topics, questions };
+      db.cache.lastBuiltAt = now();
+      saveDB();
+      clampSelections();
+      renderAll();
+      toast("Index rebuilt");
+    }
+
+    function clampSelections(){
+      if(!db.index.subjects.length){
+        selectedSubjectId = "";
+        selectedTopicId = "";
+        return;
+      }
+      if(!selectedSubjectId || !db.index.subjects.some(s => s.id === selectedSubjectId)){
+        selectedSubjectId = db.index.subjects[0].id;
+      }
+      const topicsForSubject = db.index.topics.filter(t => t.subjectId === selectedSubjectId);
+      if(!topicsForSubject.length){
+        selectedTopicId = "";
+      }else if(!selectedTopicId || !topicsForSubject.some(t => t.id === selectedTopicId)){
+        selectedTopicId = topicsForSubject[0].id;
+      }
+    }
+
+    // -----------------------------
+    // Rendering Bank UI (same as v1.1, slightly trimmed)
+    // -----------------------------
+    function renderSubjects(){
+      const list = $("#subjectsList");
+      list.innerHTML = "";
+
+      $("#subjects-count").textContent = String(db.index.subjects.length);
+
+      if(db.index.subjects.length === 0){
+        list.innerHTML = `<div class="smallnote">No subjects available in enabled sources. Import a JSON source, or enable sources.</div>`;
+        renderTopics();
+        renderQuestions();
+        return;
+      }
+
+      for(const s of db.index.subjects){
+        const tCount = db.index.topics.filter(t => t.subjectId === s.id).length;
+        const isActive = (s.id === selectedSubjectId);
+        const src = db.sources.find(x => x.id === s.sourceId);
+        const srcName = src?.name || "Unknown";
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="meta" title="${escapeHtml(s.name)}">
+            <div class="name">${escapeHtml(s.name)}</div>
+            <div class="sub">${tCount} topic(s) • <span class="badge">Source: ${escapeHtml(srcName)}</span></div>
+          </div>
+          <div class="row" style="flex:0 0 auto">
+            <button class="btn small ${isActive ? "primary" : ""}" data-action="select" data-id="${s.id}">${isActive ? "Selected" : "Select"}</button>
+            ${s.sourceId === "src_local" ? `<button class="btn small" data-action="rename" data-id="${s.id}">Rename</button>
+            <button class="btn small danger" data-action="delete" data-id="${s.id}">Delete</button>` : `<span class="badge">Imported</span>`}
+          </div>
+        `;
+        list.appendChild(el);
+      }
+
+      renderTopics();
+      syncTopicSelects();
+      renderQuestions();
+    }
+
+    function renderTopics(){
+      const list = $("#topicsList");
+      list.innerHTML = "";
+
+      const topicsForSubject = db.index.topics.filter(t => t.subjectId === selectedSubjectId);
+      $("#topics-count").textContent = String(topicsForSubject.length);
+
+      if(!selectedSubjectId){
+        list.innerHTML = `<div class="smallnote">Select a subject.</div>`;
+        return;
+      }
+      if(topicsForSubject.length === 0){
+        list.innerHTML = `<div class="smallnote">No topics for this subject (in enabled sources).</div>`;
+        return;
+      }
+
+      for(const t of topicsForSubject){
+        const qCount = db.index.questions.filter(q => q.topicId === t.id).length;
+        const isActive = (t.id === selectedTopicId);
+        const src = db.sources.find(x => x.id === t.sourceId);
+        const srcName = src?.name || "Unknown";
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="meta" title="${escapeHtml(t.name)}">
+            <div class="name">${escapeHtml(t.name)}</div>
+            <div class="sub">${qCount} question(s) • <span class="badge">Source: ${escapeHtml(srcName)}</span></div>
+          </div>
+          <div class="row" style="flex:0 0 auto">
+            <button class="btn small ${isActive ? "primary" : ""}" data-action="select" data-id="${t.id}">${isActive ? "Selected" : "Select"}</button>
+            ${t.sourceId === "src_local" ? `<button class="btn small" data-action="rename" data-id="${t.id}">Rename</button>
+            <button class="btn small danger" data-action="delete" data-id="${t.id}">Delete</button>` : `<span class="badge">Imported</span>`}
+          </div>
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    function syncTopicSelects(){
+      const topicsForSubject = db.index.topics.filter(t => t.subjectId === selectedSubjectId);
+      const topicSelect = $("#topicSelect");
+      topicSelect.innerHTML = "";
+      for(const t of topicsForSubject){
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        topicSelect.appendChild(opt);
+      }
+      topicSelect.value = selectedTopicId || (topicsForSubject[0]?.id || "");
+      selectedTopicId = topicSelect.value || "";
+      // Quiz scope UI also depends on subjects/topics lists
+      syncQuizScopeUI();
+    }
+
+    function renderQuestions(){
+      const list = $("#questionsList");
+      const searchTerm = normKey($("#searchInput").value);
+
+      const topicId = $("#topicSelect").value || "";
+      selectedTopicId = topicId;
+
+      const topic = db.index.topics.find(t => t.id === topicId);
+      const inTopic = db.index.questions
+        .filter(q => q.topicId === topicId)
+        .sort((a,b) => b.updatedAt - a.updatedAt);
+
+      const filtered = searchTerm ? inTopic.filter(q => normKey(q.text).includes(searchTerm)) : inTopic;
+
+      $("#questions-count").textContent = String(inTopic.length);
+      $("#kpiTotal").textContent = String(inTopic.length);
+      $("#kpiBookmarked").textContent = String(inTopic.filter(q => bookmarks.includes(q.id)).length);
+
+      if(!topic){
+        list.innerHTML = `<div class="smallnote">Select a topic to manage questions.</div>`;
+        return;
+      }
+      if(inTopic.length === 0){
+        list.innerHTML = `<div class="smallnote">No questions in <strong>${escapeHtml(topic.name)}</strong> (enabled sources).</div>`;
+        return;
+      }
+      if(filtered.length === 0){
+        list.innerHTML = `<div class="smallnote">No matches for <span class="mono">${escapeHtml(searchTerm)}</span>.</div>`;
+        return;
+      }
+
+      list.innerHTML = "";
+      for(const q of filtered){
+        const isBm = bookmarks.includes(q.id);
+        const src = db.sources.find(x => x.id === q.sourceId);
+        const srcName = src?.name || "Unknown";
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="meta">
+            <div class="name" title="${escapeHtml(q.text)}">${escapeHtml(q.text)}</div>
+            <div class="sub">
+              <span class="badge">Answer: ${escapeHtml(q.answer)}</span>
+              <span class="badge">Source: ${escapeHtml(srcName)}</span>
+              ${isBm ? `<span class="badge" style="border-color:rgba(83,224,196,.5); color:#d9fff7">Bookmarked</span>` : ``}
+              ${q.sourceId !== "src_local" ? `<span class="badge">Read-only</span>` : ``}
+            </div>
+          </div>
+          <div class="row" style="flex:0 0 auto; align-items:center">
+            <button class="btn small ${isBm ? "warn" : ""}" data-action="toggle-bookmark" data-id="${q.id}">${isBm ? "Unbookmark" : "Bookmark"}</button>
+            ${q.sourceId === "src_local" ? `
+              <button class="btn small" data-action="edit" data-id="${q.id}">Edit</button>
+              <button class="btn small danger" data-action="delete" data-id="${q.id}">Delete</button>
+            ` : ``}
+          </div>
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    function renderAll(){
+      renderSubjects();
+      renderSources();
+      renderBookmarksView();
+      syncQuizScopeUI();
+      updateQuizUIState();
+      updateQuizBookmarkButton();
+    }
+
+    // -----------------------------
+    // Local CRUD (same as v1.1)
+    // -----------------------------
+    function addLocalSubject(name){
+      const subject = normalize(name);
+      if(!subject){ toast("Subject name cannot be empty"); return; }
+      db.local.subjects.push({ name: subject });
+      saveDB();
+      rebuildIndex();
+      toast("Subject added (Local)");
+    }
+
+    function addLocalTopic(topicName){
+      const t = normalize(topicName);
+      if(!t){ toast("Topic name cannot be empty"); return; }
+      const subjectObj = db.index.subjects.find(s => s.id === selectedSubjectId);
+      if(!subjectObj){ toast("Select a subject first"); return; }
+      if(subjectObj.sourceId !== "src_local"){
+        toast("You can only add topics under Local subjects. Select a Local subject.");
+        return;
+      }
+      db.local.topics.push({ subject: subjectObj.name, topic: t });
+      saveDB();
+      rebuildIndex();
+      toast("Topic added (Local)");
+    }
+
+    function clearQuestionForm(){
+      $("#editingQuestionId").value = "";
+      $("#questionText").value = "";
+      $("#correctAnswer").value = "";
+      $("#formModeLabel").textContent = "Add";
+      $("#btnSaveQuestion").textContent = "Save Question";
+    }
+
+    function upsertLocalQuestion(){
+      const topicId = $("#topicSelect").value || "";
+      const topicObj = db.index.topics.find(t => t.id === topicId);
+      if(!topicObj){ toast("Select a topic first"); return; }
+      if(topicObj.sourceId !== "src_local"){
+        toast("Imported sources are read-only. Select a Local topic to add/edit questions.");
+        return;
+      }
+
+      const subjectObj = db.index.subjects.find(s => s.id === topicObj.subjectId);
+      const qText = normalize($("#questionText").value);
+      const ans = normalize($("#correctAnswer").value);
+      if(!qText || !ans){ toast("Question and answer cannot be empty"); return; }
+
+      const editingId = $("#editingQuestionId").value || "";
+      if(editingId){
+        const qIndex = db.index.questions.find(q => q.id === editingId);
+        if(!qIndex || qIndex.sourceId !== "src_local"){ toast("Cannot edit this question"); return; }
+
+        const fp = qIndex.fingerprint;
+        const rec = db.local.questions.find(r => makeQuestionFingerprint({
+          subjectName: r.subject, topicName: r.topic, text: r.question, answer: r.answer
+        }) === fp);
+
+        if(!rec){ toast("Local record not found"); return; }
+        rec.question = qText;
+        rec.answer = ans;
+        saveDB();
+        rebuildIndex();
+        toast("Question updated (Local)");
+      }else{
+        db.local.questions.push({
+          subject: subjectObj.name,
+          topic: topicObj.name,
+          question: qText,
+          answer: ans
+        });
+        saveDB();
+        rebuildIndex();
+        toast("Question added (Local)");
+      }
+
+      clearQuestionForm();
+    }
+
+    function startEditLocalQuestion(questionId){
+      const q = db.index.questions.find(x => x.id === questionId);
+      if(!q || q.sourceId !== "src_local") return;
+
+      $("#editingQuestionId").value = q.id;
+      $("#questionText").value = q.text;
+      $("#correctAnswer").value = q.answer;
+      $("#formModeLabel").textContent = "Edit";
+      $("#btnSaveQuestion").textContent = "Update Question";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteLocalQuestion(questionId){
+      const q = db.index.questions.find(x => x.id === questionId);
+      if(!q || q.sourceId !== "src_local") return;
+
+      const ok = confirm("Delete this question (Local)?");
+      if(!ok) return;
+
+      const fp = q.fingerprint;
+      db.local.questions = db.local.questions.filter(r => {
+        const rfp = makeQuestionFingerprint({subjectName: r.subject, topicName: r.topic, text: r.question, answer: r.answer});
+        return rfp !== fp;
+      });
+
+      bookmarks = bookmarks.filter(id => id !== questionId);
+      saveBookmarks();
+
+      saveDB();
+      rebuildIndex();
+      toast("Question deleted (Local)");
+    }
+
+    function renameLocalSubject(subjectId){
+      const s = db.index.subjects.find(x => x.id === subjectId);
+      if(!s || s.sourceId !== "src_local") return;
+      const newName = prompt("Rename subject:", s.name);
+      if(newName === null) return;
+      const nn = normalize(newName);
+      if(!nn){ toast("Subject name cannot be empty"); return; }
+
+      db.local.subjects = db.local.subjects.map(x => (x.name === s.name ? { ...x, name: nn } : x));
+      db.local.topics = db.local.topics.map(x => (x.subject === s.name ? { ...x, subject: nn } : x));
+      db.local.questions = db.local.questions.map(q => (q.subject === s.name ? { ...q, subject: nn } : q));
+
+      saveDB();
+      rebuildIndex();
+      toast("Subject renamed (Local)");
+    }
+
+    function deleteLocalSubject(subjectId){
+      const s = db.index.subjects.find(x => x.id === subjectId);
+      if(!s || s.sourceId !== "src_local") return;
+
+      const ok = confirm(`Delete Local subject "${s.name}"?\nThis will delete its local topics & questions.`);
+      if(!ok) return;
+
+      db.local.subjects = db.local.subjects.filter(x => x.name !== s.name);
+      db.local.topics = db.local.topics.filter(x => x.subject !== s.name);
+
+      const removedFps = new Set(
+        db.local.questions
+          .filter(q => q.subject === s.name)
+          .map(q => makeQuestionFingerprint({subjectName:q.subject, topicName:q.topic, text:q.question, answer:q.answer}))
+      );
+      db.local.questions = db.local.questions.filter(q => q.subject !== s.name);
+
+      const removedIndexIds = new Set();
+      for(const q of db.index.questions.filter(q => q.sourceId === "src_local").map(q => q.id)){
+        const qObj = db.index.questions.find(q => q.id === q);
+        if(qObj && removedFps.has(qObj.fingerprint)) removedIndexIds.add(qObj.id);
+      }
+      bookmarks = bookmarks.filter(id => !removedIndexIds.has(id));
+      saveBookmarks();
+
+      saveDB();
+      rebuildIndex();
+      toast("Subject deleted (Local)");
+    }
+
+    function renameLocalTopic(topicId){
+      const t = db.index.topics.find(x => x.id === topicId);
+      if(!t || t.sourceId !== "src_local") return;
+      const subj = db.index.subjects.find(s => s.id === t.subjectId);
+      if(!subj) return;
+
+      const newName = prompt("Rename topic:", t.name);
+      if(newName === null) return;
+      const nn = normalize(newName);
+      if(!nn){ toast("Topic name cannot be empty"); return; }
+
+      db.local.topics = db.local.topics.map(x => (x.subject === subj.name && x.topic === t.name ? { ...x, topic: nn } : x));
+      db.local.questions = db.local.questions.map(q => (q.subject === subj.name && q.topic === t.name ? { ...q, topic: nn } : q));
+
+      saveDB();
+      rebuildIndex();
+      toast("Topic renamed (Local)");
+    }
+
+    function deleteLocalTopic(topicId){
+      const t = db.index.topics.find(x => x.id === topicId);
+      if(!t || t.sourceId !== "src_local") return;
+      const subj = db.index.subjects.find(s => s.id === t.subjectId);
+      if(!subj) return;
+
+      const ok = confirm(`Delete Local topic "${t.name}"?\nThis will delete its questions.`);
+      if(!ok) return;
+
+      const removedFps = new Set(
+        db.local.questions
+          .filter(q => q.subject === subj.name && q.topic === t.name)
+          .map(q => makeQuestionFingerprint({subjectName:q.subject, topicName:q.topic, text:q.question, answer:q.answer}))
+      );
+
+      db.local.topics = db.local.topics.filter(x => !(x.subject === subj.name && x.topic === t.name));
+      db.local.questions = db.local.questions.filter(q => !(q.subject === subj.name && q.topic === t.name));
+
+      const removedIds = new Set(
+        db.index.questions
+          .filter(q => q.sourceId === "src_local" && q.topicId === topicId && removedFps.has(q.fingerprint))
+          .map(q => q.id)
+      );
+      bookmarks = bookmarks.filter(id => !removedIds.has(id));
+      saveBookmarks();
+
+      saveDB();
+      rebuildIndex();
+      toast("Topic deleted (Local)");
+    }
+
+    // -----------------------------
+    // Bookmarks
+    // -----------------------------
+    function toggleBookmark(questionId){
+      if(bookmarks.includes(questionId)){
+        bookmarks = bookmarks.filter(id => id !== questionId);
+        saveBookmarks();
+        toast("Removed bookmark");
+      }else{
+        bookmarks.push(questionId);
+        saveBookmarks();
+        toast("Bookmarked");
+      }
+      renderQuestions();
+      renderBookmarksView();
+      updateQuizBookmarkButton();
+    }
+
+    function clearAllBookmarks(){
+      const ok = confirm("Clear all bookmarks?");
+      if(!ok) return;
+      bookmarks = [];
+      saveBookmarks();
+      toast("Bookmarks cleared");
+      renderQuestions();
+      renderBookmarksView();
+      updateQuizBookmarkButton();
+    }
+
+    function renderBookmarksView(){
+      const list = $("#bookmarksList");
+      const enabledQuestionIds = new Set(db.index.questions.map(q => q.id));
+      const items = bookmarks
+        .filter(id => enabledQuestionIds.has(id))
+        .map(id => db.index.questions.find(q => q.id === id))
+        .filter(Boolean);
+
+      $("#bookmarks-count").textContent = String(items.length);
+
+      if(items.length === 0){
+        list.innerHTML = `<div class="smallnote">No bookmarked questions in enabled sources.</div>`;
+        return;
+      }
+
+      list.innerHTML = "";
+      for(const q of items){
+        const topic = db.index.topics.find(t => t.id === q.topicId);
+        const subj = topic ? db.index.subjects.find(s => s.id === topic.subjectId) : null;
+        const src = db.sources.find(x => x.id === q.sourceId);
+        const srcName = src?.name || "Unknown";
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="meta">
+            <div class="name" title="${escapeHtml(q.text)}">${escapeHtml(q.text)}</div>
+            <div class="sub">
+              <span class="badge">${escapeHtml(subj?.name || "Unknown subject")}</span>
+              <span class="badge">${escapeHtml(topic?.name || "Unknown topic")}</span>
+              <span class="badge">Answer: ${escapeHtml(q.answer)}</span>
+              <span class="badge">Source: ${escapeHtml(srcName)}</span>
+            </div>
+          </div>
+          <div class="row" style="flex:0 0 auto">
+            <button class="btn small danger" data-action="remove-bookmark" data-id="${q.id}">Remove</button>
+          </div>
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    // -----------------------------
+    // Sources UI + Import (unchanged from v1.1)
+    // -----------------------------
+    function renderSources(){
+      $("#sources-count").textContent = String(db.sources.length);
+      const list = $("#sourcesList");
+      list.innerHTML = "";
+
+      for(const src of db.sources){
+        const isLocal = src.id === "src_local";
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="meta">
+            <div class="name">${escapeHtml(src.name || src.filename || src.id)}</div>
+            <div class="sub">
+              ${src.kind === "local" ? `<span class="badge">Local</span>` : `<span class="badge">Imported</span>`}
+              ${src.filename ? `<span class="badge">File: ${escapeHtml(src.filename)}</span>` : ``}
+              <span class="badge">Enabled: ${src.enabled ? "Yes" : "No"}</span>
+            </div>
+          </div>
+          <div class="row" style="flex:0 0 auto; align-items:center">
+            <button class="btn small ${src.enabled ? "warn" : "good"}" data-action="toggle" data-id="${src.id}">
+              ${src.enabled ? "Disable" : "Enable"}
+            </button>
+            ${!isLocal ? `<button class="btn small danger" data-action="delete" data-id="${src.id}">Delete</button>` : ``}
+          </div>
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    function toggleSource(sourceId){
+      const src = db.sources.find(s => s.id === sourceId);
+      if(!src) return;
+      src.enabled = !src.enabled;
+      saveDB();
+      rebuildIndex();
+    }
+
+    function deleteSource(sourceId){
+      const src = db.sources.find(s => s.id === sourceId);
+      if(!src || src.id === "src_local") return;
+
+      const ok = confirm(`Delete source "${src.name || src.filename || src.id}"?`);
+      if(!ok) return;
+
+      bookmarks = bookmarks.filter(id => !id.startsWith(`q_${sourceId}_`));
+      saveBookmarks();
+
+      db.sources = db.sources.filter(s => s.id !== sourceId);
+      saveDB();
+      rebuildIndex();
+      toast("Source deleted");
+    }
+
+    async function importMultipleJSONFiles(fileList){
+      const files = Array.from(fileList || []);
+      if(files.length === 0) return;
+
+      const autoEnable = $("#chkAutoEnable").checked;
+
+      const details = [];
+      let errors = 0, sourcesCreated = 0, totalRead = 0, totalValid = 0;
+
+      for(const file of files){
+        let json;
+        try{ json = JSON.parse(await file.text()); }
+        catch{ errors++; details.push(`- ${file.name}: invalid JSON`); continue; }
+
+        let questions = [];
+        if(Array.isArray(json)) questions = json;
+        else if(json && Array.isArray(json.questions)) questions = json.questions;
+        else{ errors++; details.push(`- ${file.name}: expected array OR {questions:[...]}`); continue; }
+
+        totalRead += questions.length;
+
+        const valid = [];
+        for(const rec of questions){
+          const subject = normalize(rec?.subject);
+          const topic = normalize(rec?.topic);
+          const question = normalize(rec?.question);
+          const answer = normalize(rec?.answer);
+          if(!subject || !topic || !question || !answer) continue;
+          valid.push({ subject, topic, question, answer });
+        }
+        totalValid += valid.length;
+
+        const sourceId = uid("src");
+        const srcName = file.name.replace(/\.json$/i, "");
+
+        db.sources.push({
+          id: sourceId,
+          kind: "imported",
+          name: srcName,
+          filename: file.name,
+          enabled: !!autoEnable,
+          importedAt: new Date().toISOString(),
+          raw: { questions: valid },
+          stats: { read: questions.length, valid: valid.length }
+        });
+
+        sourcesCreated++;
+        details.push(`- ${file.name}: imported ${valid.length}/${questions.length} valid question(s)`);
+      }
+
+      saveDB();
+      rebuildIndex();
+
+      $("#importSummary").innerHTML =
+        `<div><strong>Import complete</strong></div>` +
+        `<div>Sources created: ${sourcesCreated}</div>` +
+        `<div>Valid questions: ${totalValid} (read ${totalRead})</div>` +
+        (errors ? `<div style="color:var(--warn)">Errors: ${errors}</div>` : ``) +
+        `<div style="margin-top:8px" class="mono">${escapeHtml(details.join("\n"))}</div>`;
+
+      toast("Imported sources");
+    }
+
+    // -----------------------------
+    // Export + preview
+    // -----------------------------
+    function getExportAllPayload(){
+      return { version: 1.2, exportedAt: new Date().toISOString(), db, bookmarks };
+    }
+    function exportJSON(payload, filename){
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+    function exportAll(){
+      exportJSON(getExportAllPayload(), `study-program-all-${new Date().toISOString().slice(0,10)}.json`);
+      toast("Exported ALL");
+    }
+    function exportEnabledView(){
+      const questions = db.index.questions.map(q => {
+        const t = db.index.topics.find(x => x.id === q.topicId);
+        const s = t ? db.index.subjects.find(x => x.id === t.subjectId) : null;
+        return { subject: s?.name || "", topic: t?.name || "", question: q.text, answer: q.answer, source: q.sourceId };
+      });
+      exportJSON({ questions }, `study-program-enabled-${new Date().toISOString().slice(0,10)}.json`);
+      toast("Exported enabled view");
+    }
+
+    function refreshDataPreview(){
+      const el = $("#dataPreview");
+      if(!el) return;
+      el.value = JSON.stringify(getExportAllPayload(), null, 2);
+    }
+
+    function resetAllData(){
+      const ok = confirm("Reset ALL data?");
+      if(!ok) return;
+      localStorage.removeItem(LS_KEYS.DB);
+      localStorage.removeItem(LS_KEYS.BOOKMARKS);
+      db = loadDB();
+      bookmarks = [];
+      saveBookmarks();
+      rebuildIndex();
+      $("#importSummary").textContent = "";
+      toast("All data cleared");
+    }
+
+    // -----------------------------
+    // NEW: Quiz scope selection (multi subjects/topics)
+    // -----------------------------
+    function getSelectedValues(selectEl){
+      return Array.from(selectEl.selectedOptions).map(o => o.value);
+    }
+
+    function setSelectedValues(selectEl, valuesSet){
+      for(const opt of selectEl.options){
+        opt.selected = valuesSet.has(opt.value);
+      }
+    }
+
+    function getTopicsForSubjectIds(subjectIds){
+      const set = new Set();
+      for(const t of db.index.topics){
+        if(subjectIds.has(t.subjectId)) set.add(t.id);
+      }
+      return set;
+    }
+
+    function computeQuizQuestionPool(topicIds){
+      const topicSet = new Set(topicIds);
+      const pool = db.index.questions.filter(q => topicSet.has(q.topicId)).map(q => q.id);
+      return pool;
+    }
+
+    function updateQuizScopeCount(){
+      // derive actual topics in scope based on rules:
+      // - if any subjects selected => include all topics under those subjects (auto)
+      // - plus any manually selected topics (union)
+      const subjIds = quizState.selectedSubjectIds;
+      const manualTopicIds = quizState.selectedTopicIds;
+
+      const autoTopicIds = subjIds.size ? getTopicsForSubjectIds(subjIds) : new Set();
+      const unionTopics = new Set([...autoTopicIds, ...manualTopicIds]);
+
+      quizState.questionPoolIds = computeQuizQuestionPool(unionTopics);
+
+      $("#quizScopeCount").textContent = String(quizState.questionPoolIds.length);
+
+      // if subjects selected, keep topics UI synced (auto-select those topics too)
+      if(subjIds.size){
+        const topicsSelect = $("#quizTopicsSelect");
+        setSelectedValues(topicsSelect, unionTopics);
+      }
+
+      // enable/disable start depending on pool
+      $("#btnStartQuiz").disabled = quizState.questionPoolIds.length === 0;
+    }
+
+    function syncQuizScopeUI(){
+      // populate subjects
+      const subjectsSel = $("#quizSubjectsSelect");
+      const topicsSel = $("#quizTopicsSelect");
+      if(!subjectsSel || !topicsSel) return;
+
+      // Rebuild options but preserve selection by id if possible
+      const prevSubj = new Set(quizState.selectedSubjectIds);
+      const prevTopics = new Set(quizState.selectedTopicIds);
+
+      subjectsSel.innerHTML = "";
+      for(const s of db.index.subjects){
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.name;
+        subjectsSel.appendChild(opt);
+      }
+
+      topicsSel.innerHTML = "";
+      // topic label includes subject for clarity
+      const topics = [...db.index.topics].sort((a,b) => {
+        const sa = db.index.subjects.find(s => s.id === a.subjectId)?.name || "";
+        const sb = db.index.subjects.find(s => s.id === b.subjectId)?.name || "";
+        const c1 = sa.localeCompare(sb);
+        if(c1 !== 0) return c1;
+        return a.name.localeCompare(b.name);
+      });
+      for(const t of topics){
+        const subj = db.index.subjects.find(s => s.id === t.subjectId);
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = `${subj ? subj.name + " → " : ""}${t.name}`;
+        topicsSel.appendChild(opt);
+      }
+
+      // restore selections (filter out removed)
+      quizState.selectedSubjectIds = new Set([...prevSubj].filter(id => db.index.subjects.some(s => s.id === id)));
+      quizState.selectedTopicIds = new Set([...prevTopics].filter(id => db.index.topics.some(t => t.id === id)));
+
+      setSelectedValues(subjectsSel, quizState.selectedSubjectIds);
+      setSelectedValues(topicsSel, quizState.selectedTopicIds);
+
+      // default: if nothing selected, choose currently selectedTopicId (bank view) as a convenience
+      if(quizState.selectedSubjectIds.size === 0 && quizState.selectedTopicIds.size === 0 && selectedTopicId){
+        quizState.selectedTopicIds.add(selectedTopicId);
+        setSelectedValues(topicsSel, quizState.selectedTopicIds);
+      }
+
+      updateQuizScopeCount();
+      updateQuizUIState();
+      updateQuizBookmarkButton();
+    }
+
+    function startQuiz(){
+      // reset session stats
+      quizState.score = 0;
+      quizState.seen = 0;
+      quizState.currentQuestionId = "";
+
+      updateQuizScopeCount();
+      if(quizState.questionPoolIds.length === 0){
+        $("#quizQuestionText").textContent = "No questions in selected scope. Choose subjects/topics.";
+        $("#quizBadge").textContent = "Empty";
+        updateQuizUIState();
+        return;
+      }
+      nextQuizQuestion(true);
+      toast("Quiz started");
+    }
+
+    function randomPick(arr){
+      if(!arr.length) return null;
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function nextQuizQuestion(){
+      const poolIds = quizState.questionPoolIds;
+      if(poolIds.length === 0) return;
+
+      const pickedId = randomPick(poolIds);
+      const picked = db.index.questions.find(q => q.id === pickedId);
+      if(!picked) return;
+
+      quizState.currentQuestionId = picked.id;
+      quizState.seen += 1;
+
+      $("#quizQuestionText").textContent = picked.text;
+      $("#quizAnswerInput").value = "";
+      $("#quizAnswerInput").disabled = false;
+      $("#btnSubmitAnswer").disabled = false;
+      $("#btnNextQuestion").disabled = true;
+
+      $("#quizResult").style.display = "none";
+      $("#quizBadge").textContent = "In progress";
+      updateQuizUIState();
+      updateQuizBookmarkButton();
+
+      setTimeout(() => $("#quizAnswerInput").focus(), 0);
+    }
+
+    function normalizeAnswer(s){ return normKey(s); }
+
+    function checkAnswer(){
+      const q = db.index.questions.find(x => x.id === quizState.currentQuestionId);
+      if(!q) return;
+
+      const user = normalizeAnswer($("#quizAnswerInput").value);
+      const correct = normalizeAnswer(q.answer);
+      const isCorrect = user.length > 0 && user === correct;
+      if(isCorrect) quizState.score += 1;
+
+      const result = $("#quizResult");
+      result.style.display = "block";
+      result.className = "result " + (isCorrect ? "correct" : "incorrect");
+      result.innerHTML = `
+        <div style="font-weight:700; margin-bottom:6px">${isCorrect ? "Correct!" : "Incorrect"}</div>
+        <div class="smallnote">Correct answer: <span class="mono">${escapeHtml(q.answer)}</span></div>
+      `;
+
+      $("#btnNextQuestion").disabled = false;
+      $("#btnSubmitAnswer").disabled = true;
+      $("#quizAnswerInput").disabled = true;
+
+      updateQuizUIState();
+    }
+
+    function updateQuizUIState(){
+      const total = quizState.questionPoolIds.length;
+      $("#scoreLabel").textContent = String(quizState.score);
+      $("#seenLabel").textContent = String(quizState.seen);
+      $("#progressLabel").textContent = `${Math.min(quizState.seen, total)} of ${total}`;
+
+      // start enabled updated by updateQuizScopeCount
+      if(total === 0){
+        $("#btnSubmitAnswer").disabled = true;
+        $("#btnNextQuestion").disabled = true;
+        $("#quizAnswerInput").disabled = true;
+        $("#btnQuizBookmark").disabled = true;
+      }
+    }
+
+    function updateQuizBookmarkButton(){
+      const qid = quizState.currentQuestionId;
+      const btn = $("#btnQuizBookmark");
+      const q = db.index.questions.find(x => x.id === qid);
+      if(!qid || !q){
+        btn.disabled = true;
+        btn.textContent = "Bookmark";
+        btn.classList.remove("warn");
+        return;
+      }
+      const isBm = bookmarks.includes(qid);
+      btn.disabled = false;
+      btn.textContent = isBm ? "Unbookmark" : "Bookmark";
+      btn.classList.toggle("warn", isBm);
+    }
+
+    // -----------------------------
+    // Wiring
+    // -----------------------------
+    function wireTabs(){
+      document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => setActiveTab(btn.dataset.view)));
+    }
+
+    function wireSubjectActions(){
+      $("#btnAddSubject").addEventListener("click", () => {
+        addLocalSubject($("#subjectName").value);
+        $("#subjectName").value = "";
+        $("#subjectName").focus();
+      });
+
+      $("#subjectsList").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action]");
+        if(!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+
+        if(action === "select"){
+          selectedSubjectId = id;
+          selectedTopicId = "";
+          clampSelections();
+          renderSubjects();
+          syncTopicSelects();
+          renderQuestions();
+        }else if(action === "rename"){
+          renameLocalSubject(id);
+        }else if(action === "delete"){
+          deleteLocalSubject(id);
+        }
+      });
+    }
+
+    function wireTopicActions(){
+      $("#btnAddTopic").addEventListener("click", () => {
+        addLocalTopic($("#topicName").value);
+        $("#topicName").value = "";
+        $("#topicName").focus();
+      });
+
+      $("#topicsList").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action]");
+        if(!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+
+        if(action === "select"){
+          selectedTopicId = id;
+          $("#topicSelect").value = id;
+          renderTopics();
+          renderQuestions();
+        }else if(action === "rename"){
+          renameLocalTopic(id);
+        }else if(action === "delete"){
+          deleteLocalTopic(id);
+        }
+      });
+
+      $("#topicSelect").addEventListener("change", () => {
+        selectedTopicId = $("#topicSelect").value || "";
+        clearQuestionForm();
+        renderQuestions();
+      });
+    }
+
+    function wireQuestionActions(){
+      $("#btnSaveQuestion").addEventListener("click", upsertLocalQuestion);
+      $("#btnClearForm").addEventListener("click", clearQuestionForm);
+      $("#searchInput").addEventListener("input", () => renderQuestions());
+
+      $("#questionsList").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action]");
+        if(!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+
+        if(action === "toggle-bookmark") toggleBookmark(id);
+        if(action === "edit") startEditLocalQuestion(id);
+        if(action === "delete") deleteLocalQuestion(id);
+      });
+    }
+
+    function wireQuiz(){
+      const subjectsSel = $("#quizSubjectsSelect");
+      const topicsSel = $("#quizTopicsSelect");
+
+      subjectsSel.addEventListener("change", () => {
+        quizState.selectedSubjectIds = new Set(getSelectedValues(subjectsSel));
+        // When subjects are selected, auto include all topics of selected subjects
+        updateQuizScopeCount();
+      });
+
+      topicsSel.addEventListener("change", () => {
+        quizState.selectedTopicIds = new Set(getSelectedValues(topicsSel));
+        updateQuizScopeCount();
+      });
+
+      $("#btnQuizSelectAllSubjects").addEventListener("click", () => {
+        quizState.selectedSubjectIds = new Set(db.index.subjects.map(s => s.id));
+        setSelectedValues(subjectsSel, quizState.selectedSubjectIds);
+        updateQuizScopeCount();
+      });
+
+      $("#btnQuizClearSubjects").addEventListener("click", () => {
+        quizState.selectedSubjectIds = new Set();
+        setSelectedValues(subjectsSel, quizState.selectedSubjectIds);
+        updateQuizScopeCount();
+      });
+
+      $("#btnQuizSelectAllTopics").addEventListener("click", () => {
+        quizState.selectedTopicIds = new Set(db.index.topics.map(t => t.id));
+        setSelectedValues(topicsSel, quizState.selectedTopicIds);
+        updateQuizScopeCount();
+      });
+
+      $("#btnQuizClearTopics").addEventListener("click", () => {
+        quizState.selectedTopicIds = new Set();
+        setSelectedValues(topicsSel, quizState.selectedTopicIds);
+        updateQuizScopeCount();
+      });
+
+      $("#btnStartQuiz").addEventListener("click", () => {
+        $("#btnNextQuestion").disabled = true;
+        $("#btnSubmitAnswer").disabled = true;
+        $("#quizAnswerInput").disabled = true;
+        startQuiz();
+      });
+
+      $("#btnSubmitAnswer").addEventListener("click", checkAnswer);
+
+      $("#quizAnswerInput").addEventListener("keydown", (e) => {
+        if(e.key === "Enter" && !$("#btnSubmitAnswer").disabled){
+          e.preventDefault();
+          checkAnswer();
+        }
+      });
+
+      $("#btnNextQuestion").addEventListener("click", () => {
+        $("#btnNextQuestion").disabled = true;
+        nextQuizQuestion();
+      });
+
+      $("#btnQuizBookmark").addEventListener("click", () => {
+        if(quizState.currentQuestionId) toggleBookmark(quizState.currentQuestionId);
+      });
+    }
+
+    function wireBookmarks(){
+      $("#bookmarksList").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action]");
+        if(!btn) return;
+        const id = btn.dataset.id;
+        toggleBookmark(id);
+      });
+      $("#btnClearBookmarks").addEventListener("click", clearAllBookmarks);
+    }
+
+    function wireData(){
+      $("#importFiles").addEventListener("change", async (e) => {
+        await importMultipleJSONFiles(e.target.files);
+        e.target.value = "";
+      });
+
+      $("#sourcesList").addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action]");
+        if(!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        if(action === "toggle") toggleSource(id);
+        if(action === "delete") deleteSource(id);
+      });
+
+      $("#btnRebuildIndex").addEventListener("click", rebuildIndex);
+      $("#btnResetAll").addEventListener("click", resetAllData);
+      $("#btnExportAll").addEventListener("click", exportAll);
+      $("#btnExportEnabled").addEventListener("click", exportEnabledView);
+    }
+
+    // -----------------------------
+    // Init
+    // -----------------------------
+    function init(){
+      wireTabs();
+      wireSubjectActions();
+      wireTopicActions();
+      wireQuestionActions();
+      wireQuiz();
+      wireBookmarks();
+      wireData();
+
+      if(!db.index.subjects.length && !db.index.topics.length && !db.index.questions.length){
+        rebuildIndex();
+      }else{
+        clampSelections();
+        renderAll();
+        refreshDataPreview();
+      }
+
+      setActiveTab("bank");
+    }
+
+    init();
+  </script>
+</body>
+</html>
