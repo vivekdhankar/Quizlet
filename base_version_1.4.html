@@ -217,6 +217,28 @@
       min-height: 160px;
       font-family: var(--mono);
     }
+    .quiz-scope-body{
+      overflow:hidden;
+      transition: max-height .3s ease, opacity .25s ease;
+      max-height: 1000px;
+      opacity: 1;
+    }
+    .quiz-scope-body.collapsed{
+      max-height: 0;
+      opacity: 0;
+    }
+    .quiz-scope-toggle{
+      background:none;
+      border:none;
+      color:var(--muted);
+      cursor:pointer;
+      font-size:13px;
+      padding:2px 6px;
+      border-radius:6px;
+      transition:.15s ease;
+      user-select:none;
+    }
+    .quiz-scope-toggle:hover{color:var(--text)}
   </style>
 </head>
 <body>
@@ -362,34 +384,40 @@
       </div>
       <div class="bd">
         <div class="qcard">
-          <div style="font-weight:700;margin-bottom:6px">Quiz Scope</div>
-          <div class="smallnote" style="margin-bottom:10px">
-            Select <strong>multiple subjects</strong> and/or <strong>multiple topics</strong>.
-            If you select multiple subjects, all topics of those subjects are automatically included.
-            If you select only topics, subjects are optional.
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-weight:700">Quiz Scope</div>
+            <button class="quiz-scope-toggle" id="btnToggleScope" aria-expanded="true" aria-controls="quizScopeBody" title="Toggle scope panel">▲ Hide</button>
           </div>
 
-          <div class="two">
-            <div class="col">
-              <label for="quizSubjectsSelect">Subjects (multi-select)</label>
-              <select id="quizSubjectsSelect" class="multi" multiple></select>
-              <div class="row">
-                <button class="btn small" id="btnQuizSelectAllSubjects">Select All</button>
-                <button class="btn small ghost" id="btnQuizClearSubjects">Clear</button>
+          <div id="quizScopeBody" class="quiz-scope-body">
+            <div class="smallnote" style="margin-bottom:10px">
+              Select <strong>multiple subjects</strong> and/or <strong>multiple topics</strong>.
+              If you select multiple subjects, all topics of those subjects are automatically included.
+              If you select only topics, subjects are optional.
+            </div>
+
+            <div class="two">
+              <div class="col">
+                <label for="quizSubjectsSelect">Subjects (multi-select)</label>
+                <select id="quizSubjectsSelect" class="multi" multiple></select>
+                <div class="row">
+                  <button class="btn small" id="btnQuizSelectAllSubjects">Select All</button>
+                  <button class="btn small ghost" id="btnQuizClearSubjects">Clear</button>
+                </div>
+              </div>
+
+              <div class="col">
+                <label for="quizTopicsSelect">Topics (multi-select)</label>
+                <select id="quizTopicsSelect" class="multi" multiple></select>
+                <div class="row">
+                  <button class="btn small" id="btnQuizSelectAllTopics">Select All</button>
+                  <button class="btn small ghost" id="btnQuizClearTopics">Clear</button>
+                </div>
               </div>
             </div>
 
-            <div class="col">
-              <label for="quizTopicsSelect">Topics (multi-select)</label>
-              <select id="quizTopicsSelect" class="multi" multiple></select>
-              <div class="row">
-                <button class="btn small" id="btnQuizSelectAllTopics">Select All</button>
-                <button class="btn small ghost" id="btnQuizClearTopics">Clear</button>
-              </div>
-            </div>
+            <div class="hr"></div>
           </div>
-
-          <div class="hr"></div>
 
           <div class="row" style="justify-content:space-between;align-items:center">
             <div class="row">
@@ -1493,6 +1521,22 @@
       updateQuizBookmarkButton();
     }
 
+    function collapseQuizScope(){
+      const body = $("#quizScopeBody");
+      const btn = $("#btnToggleScope");
+      body.classList.add("collapsed");
+      btn.textContent = "▼ Show Scope";
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleQuizScope(){
+      const body = $("#quizScopeBody");
+      const btn = $("#btnToggleScope");
+      const isCollapsed = body.classList.toggle("collapsed");
+      btn.textContent = isCollapsed ? "▼ Show Scope" : "▲ Hide";
+      btn.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+    }
+
     function startQuiz(){
       // reset session stats
       quizState.score = 0;
@@ -1506,6 +1550,7 @@
         updateQuizUIState();
         return;
       }
+      collapseQuizScope();
       nextQuizQuestion(true);
       toast("Quiz started");
     }
@@ -1726,6 +1771,8 @@
         $("#quizAnswerInput").disabled = true;
         startQuiz();
       });
+
+      $("#btnToggleScope").addEventListener("click", toggleQuizScope);
 
       $("#btnSubmitAnswer").addEventListener("click", checkAnswer);
 
